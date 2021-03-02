@@ -87,8 +87,17 @@ func (r PhotosLibraryAlbumsRepository) Get(ctx context.Context, albumId string) 
 
 // ListAll fetches and caches all the albums from the repo.
 func (r PhotosLibraryAlbumsRepository) ListAll(ctx context.Context) ([]Album, error) {
+	return r.ListAllWithOptions(ctx, ListOptions{ExcludeNonAppCreatedData: true})
+}
+
+// ListAllWithOptions fetches and caches all the albums from the repo.
+func (r PhotosLibraryAlbumsRepository) ListAllWithOptions(ctx context.Context, params ListOptions) ([]Album, error) {
 	albumsResult := make([]Album, 0)
-	err := r.service.List().ExcludeNonAppCreatedData().Pages(ctx, func(response *photoslibrary.ListAlbumsResponse) error {
+	listFn := r.service.List
+	if params.ExcludeNonAppCreatedData {
+		listFn = listFn().ExcludeNonAppCreatedData
+	}
+	err := listFn().Pages(ctx, func(response *photoslibrary.ListAlbumsResponse) error {
 		for _, res := range response.Albums {
 			albumsResult = append(albumsResult, r.convertPhotosLibraryAlbumToAlbum(res))
 		}

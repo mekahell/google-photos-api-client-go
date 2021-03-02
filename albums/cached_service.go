@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+// Parameters to specify for retrieving albums
+type ListOptions struct {
+	ExcludeNonAppCreatedData bool
+}
+
 // Repository represents a albums repository.
 type Repository interface {
 	AddManyItems(ctx context.Context, albumId string, mediaItemIds []string) error
@@ -13,6 +18,7 @@ type Repository interface {
 	Create(ctx context.Context, title string) (*Album, error)
 	Get(ctx context.Context, albumId string) (*Album, error)
 	ListAll(ctx context.Context) ([]Album, error)
+	ListAllWithOptions(ctx context.Context, params ListOptions) ([]Album, error)
 	GetByTitle(ctx context.Context, title string) (*Album, error)
 }
 
