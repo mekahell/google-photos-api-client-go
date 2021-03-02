@@ -104,11 +104,16 @@ func (s CachedAlbumsService) GetByTitle(ctx context.Context, title string) (*Alb
 
 // List fetches and caches all the albums from the repo.
 func (s CachedAlbumsService) List(ctx context.Context) ([]Album, error) {
+	return s.ListWithOptions(ctx, ListOptions{ExcludeNonAppCreatedData: true})
+}
+
+// List fetches and caches all the albums from the repo.
+func (s CachedAlbumsService) ListWithOptions(ctx context.Context, opts ListOptions) ([]Album, error) {
 	nullAlbums := make([]Album, 0)
 	if err := s.cache.InvalidateAllAlbums(ctx); err != nil {
 		return nullAlbums, err
 	}
-	albums, err := s.repo.ListAll(ctx)
+	albums, err := s.repo.ListAllWithOptions(ctx, opts)
 	if err != nil {
 		return nullAlbums, err
 	}
